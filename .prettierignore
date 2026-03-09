@@ -1,0 +1,9 @@
+# 패키지 및 빌드 디렉토리
+node_modules/
+.nuxt/
+.output/
+dist/
+
+# 기타 무시할 파일들
+package-lock.json
+*.md
