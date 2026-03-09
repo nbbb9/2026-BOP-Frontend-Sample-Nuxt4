@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import { createColumnHelper } from '@tanstack/vue-table';
 import { CalendarDate, DateFormatter, getLocalTimeZone } from '@internationalized/date';
-
 import {
   linkMenu, locationTree, corpOptions, bopTypeOptions,
-  statusCardsData, productsData
-} from '~/utils/mockData';
+  statusCardsData, productsData, simHistoryOptions
+} from '~/utils/mockupData/mockData';
 import TableGrid from "~/components/common/TableGrid.vue";
 
 export interface Product {
@@ -22,6 +21,10 @@ export interface Product {
   finalDate: string;
 }
 
+const listTitle = '공정 설계 현황 List';
+const products = ref(productsData);
+
+// TODO 상의 필요 = columnHelper를 각 사용처마다 호출해서 사용하는게 맞다고 생각함
 const columnHelper = createColumnHelper<Product>();
 
 const columns = [
@@ -76,29 +79,30 @@ const sidebarMenu = ref(linkMenu);
 const sidebarSearchInput = ref('');
 // 사이드바 Tree 데이터
 const sidebarTree = ref(locationTree);
+
 // 사이드바 Tree 접기/펼치기 Toggle 메서드
 const toggleExpand = (node: any) => {
   node.expanded = !node.expanded;
 };
+
 // 검색 필터값(초기 상태 설정)
 const searchFilters = ref({
   // 'GUMI' -> corpOptions[0] (구미 객체)
   corp: corpOptions[0], // 'GUMI'
   bopType: bopTypeOptions[0] // 'dev'
 });
+
 // KPI 카드 색상 매핑 (utils에서 가져온 Raw 데이터에 UI 속성 추가)
-// statusCardsData는 utils/mockData.ts에서 자동으로 불러옴
+// statusCardsData는 mockData.ts에서 자동으로 불러옴
 const statusCards = ref(statusCardsData.map((card: any, index: number) => {
   let color: 'primary' | 'green' = 'primary';
   return { ...card, color };
 }));
 
-const products = ref(productsData);
-
 // 조회 버튼을 클릭하였을 때 로직
 const onSearch = () => {
   console.log('조회 로직 수행');
-  // API 호출 후 products.value 갱신 로 직추가
+  // API 호출 후 products.value 갱신 로직추가
 };
 
 const goToGraph = () => {
@@ -124,7 +128,7 @@ const goToGraph = () => {
                 :items="sidebarMenu"
                 class="w-full"
                 :ui="{
-                  link: 'px-3 py-2' // v2와 비슷한 패딩감을 위해 추가 가능
+                  link: 'px-3 py-2'
                 }"
             />
           </div>
@@ -235,9 +239,42 @@ const goToGraph = () => {
                 <UProgress v-model="card.value" status :color="card.color" size="sm" />
               </div>
             </div>
+            <TableGrid
+                :title="listTitle"
+                :data="products"
+                :columns="columns"
+                :merge-columns="['bopType']"
+            >
+              <template #cell-bopType="{ cell }">
+                {{ cell.getValue() === 'dev' ? '개발' : (cell.getValue() === 'mass' ? '양산' : cell.getValue()) }}
+              </template>
 
-            <TableGrid :data="products" :columns="columns" />
+              <template #cell-simHistory="{ cell, row }">
+                <div v-if="cell.getValue() === 'none'" class="text-gray-300">-</div>
+                <USelectMenu
+                    v-else
+                    v-model="row.original.simHistory"
+                    :items="simHistoryOptions"
+                    option-attribute="label"
+                    value-attribute="value"
+                    size="xs"
+                    class="w-32 mx-auto"
+                />
+              </template>
 
+              <template #cell-verification="{ cell }">
+                <div v-if="cell.getValue() === 'none'" class="text-gray-300">-</div>
+                <UButton v-else-if="cell.getValue() === 'ready'" label="Ready" color="primary" variant="soft" size="xs" class="w-16 justify-center" />
+                <UBadge v-else label="Done" color="primary" variant="subtle" size="xs" />
+              </template>
+
+              <template #cell-result="{ cell }">
+                <div v-if="cell.getValue() === 'none'" class="text-gray-300">-</div>
+                <UBadge v-else-if="cell.getValue() === 'complete'" label="Complete" color="primary" variant="solid" class="w-20 justify-center" />
+                <UBadge v-else-if="cell.getValue() === 'processing'" label="Processing" color="primary" variant="solid" class="w-20 justify-center" />
+                <span v-else class="text-gray-300 text-xs">Waiting</span>
+              </template>
+            </TableGrid>
           </div>
         </div>
       </main>

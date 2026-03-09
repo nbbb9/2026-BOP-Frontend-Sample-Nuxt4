@@ -11,6 +11,6 @@ import { useRouter } from 'vue-router';
 const router = useRouter();
 
 const navigateToExamplePage = () => {
-  router.push('/examplePage');
+  router.push('/examplePage.vue');
 };
 </script>
