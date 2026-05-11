@@ -1,14 +1,13 @@
 <template>
-  <UApp>
+  <v-app>
     <NuxtPage />
-  </UApp>
+  </v-app>
 </template>
 
 <script setup lang="ts">
+import { useTheme } from 'vuetify'
 
-// 컬러 모드 훅 가져오기 (Nuxt UI 자동 임포트)
-const colorMode = useColorMode()
+const theme = useTheme(); // Vuetify 테마 객체 가져오기
 
-// 시스템 설정을 무시하고 'light/dark' 모드로 강제 고정
-colorMode.preference = 'light'
+theme.global.name.value = 'light'; // 'light' 모드로 강제 지정
 </script>

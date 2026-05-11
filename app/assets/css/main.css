@@ -1,9 +1,4 @@
-@import "tailwindcss";
-@import "@nuxt/ui";
 
-/* Nuxt UI v3 + Tailwind v4 매핑
-  :root에 직접 변수를 선언하여 Tailwind가 'primary' 색상을 인식하도록 합니다.
-*/
 @theme {
     /* primary-* 토큰을 green-* 색상 변수로 연결 */
     --color-primary-50: var(--color-green-50);
