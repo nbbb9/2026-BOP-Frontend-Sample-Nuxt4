@@ -1,6 +1,3 @@
-// https://nuxt.com/docs/api/configuration/nuxt-config
-import tailwindcss from "@tailwindcss/vite";
-
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
 
@@ -13,9 +10,19 @@ export default defineNuxtConfig({
   ],
 
   modules: [
-      '@nuxt/ui',
+      'vuetify-nuxt-module',
       '@pinia/nuxt',
   ],
+
+  vuetify: {
+		moduleOptions: {},
+  },
+
+  runtimeConfig: {
+		public: {
+			baseUrl: '',
+		},
+  },
 
   devtools: { enabled: true }
 })
